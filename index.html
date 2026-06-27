@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BVR DATA FLOW — Estrategia Digital para PyMEs Mexicanas</title>
+  <meta name="description" content="Ofrecemos a las PyMEs mexicanas estrategias digitales a medida, soluciones tecnológicas y análisis de datos para impulsar su crecimiento y optimizar sus procesos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #1A1A1A;
+      --navy2:   #242424;
+      --copper:  #C87941;
+      --copper2: #E09058;
+      --dark:    #111111;
+      --white:   #F7F8FA;
+      --gray:    #9A9A9A;
+      --gray2:   #C8C8C8;
+      --charcoal:#4A4A4A;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 6%;
+      background: rgba(26,26,26,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(200,121,65,0.18);
+      transition: background .3s;
+    }
+    .logo {
+      font-size: 1.25rem; font-weight: 900; letter-spacing: -.02em;
+      color: var(--white); display: flex; align-items: center; gap: .5rem;
+    }
+    .logo-icon { width: 32px; height: 32px; }
+    .logo span { color: var(--copper); }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      color: var(--gray2); font-size: .9rem; font-weight: 500;
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--copper); }
+    .nav-cta {
+      background: var(--copper); color: #fff;
+      padding: .55rem 1.4rem; border-radius: 6px;
+      font-weight: 700; font-size: .88rem; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: var(--copper2); transform: translateY(-1px); }
+
+    /* ─── HERO ────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 3rem;
+      padding: 7rem 6% 4rem;
+      position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(200,121,65,.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(200,121,65,.12); border: 1px solid rgba(200,121,65,.3);
+      color: var(--copper); padding: .35rem .9rem; border-radius: 99px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .04em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--copper); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    h1 {
+      font-size: clamp(2.4rem, 4.5vw, 4rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -.03em; margin-bottom: 1.5rem;
+    }
+    h1 em { font-style: normal; color: var(--copper); }
+    .hero-sub {
+      font-size: 1.1rem; color: var(--gray); line-height: 1.7;
+      max-width: 480px; margin-bottom: 2.5rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--copper); color: #fff;
+      padding: .85rem 2rem; border-radius: 8px; font-weight: 700;
+      font-size: 1rem; text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 24px rgba(200,121,65,.35);
+    }
+    .btn-primary:hover { background: var(--copper2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,121,65,.45); }
+    .btn-secondary {
+      border: 1.5px solid rgba(247,248,250,.2); color: var(--white);
+      padding: .85rem 2rem; border-radius: 8px; font-weight: 600;
+      font-size: 1rem; text-decoration: none;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--copper); background: rgba(200,121,65,.08); }
+
+    /* DATA FLOW CANVAS */
+    .hero-visual {
+      position: relative; height: 480px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #flowCanvas {
+      width: 100%; height: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(200,121,65,.15);
+      background: rgba(17,17,17,.7);
+    }
+
+    /* ─── SECCIÓN BASE ───────────────────────────────── */
+    section { padding: 6rem 6%; }
+    .section-eyebrow {
+      color: var(--copper); font-size: .8rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase; margin-bottom: .8rem;
+    }
+    h2 {
+      font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+      font-weight: 800; letter-spacing: -.025em; line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    h2 em { font-style: normal; color: var(--copper); }
+    .section-sub { color: var(--gray); font-size: 1.05rem; line-height: 1.7; max-width: 560px; }
+
+    /* ─── MÉTRICAS ───────────────────────────────────── */
+    #metricas { background: var(--dark); }
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 2px;
+      margin-top: 3.5rem;
+      border: 1px solid rgba(200,121,65,.15); border-radius: 12px; overflow: hidden;
+    }
+    .metric-card {
+      padding: 2.5rem 2rem;
+      background: rgba(36,36,36,.7);
+      border-right: 1px solid rgba(200,121,65,.1);
+      transition: background .25s;
+    }
+    .metric-card:last-child { border-right: none; }
+    .metric-card:hover { background: rgba(200,121,65,.07); }
+    .metric-num {
+      font-size: 3rem; font-weight: 900; letter-spacing: -.04em;
+      color: var(--copper); line-height: 1; margin-bottom: .5rem;
+    }
+    .metric-num span { color: var(--copper2); }
+    .metric-label { color: var(--gray2); font-size: .95rem; line-height: 1.5; }
+
+    /* ─── SERVICIOS ──────────────────────────────────── */
+    #servicios { background: var(--navy); }
+    .services-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 3.5rem; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5px;
+      background: rgba(200,121,65,.1); border-radius: 14px; overflow: hidden;
+    }
+    .service-card {
+      background: var(--navy2); padding: 2.5rem 2.2rem;
+      transition: background .25s, transform .2s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--copper); transform: scaleX(0); transition: transform .3s;
+    }
+    .service-card:hover { background: rgba(200,121,65,.06); transform: translateY(-3px); }
+    .service-card:hover::after { transform: scaleX(1); }
+    .service-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: rgba(200,121,65,.12); border: 1px solid rgba(200,121,65,.25);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem; font-size: 1.5rem;
+    }
+    .service-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: .7rem; letter-spacing: -.02em; }
+    .service-card p { color: var(--gray); font-size: .92rem; line-height: 1.65; }
+
+    /* ─── PROCESO ────────────────────────────────────── */
+    #proceso { background: var(--dark); }
+    .process-steps {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 0;
+      margin-top: 3.5rem; position: relative;
+    }
+    .process-steps::before {
+      content: '';
+      position: absolute; top: 28px; left: 12.5%; right: 12.5%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--copper), var(--copper), transparent);
+      opacity: .3;
+    }
+    .step { padding: 0 1.5rem 1.5rem; text-align: center; animation: fadeUp .6s ease both; }
+    .step:nth-child(2){animation-delay:.1s}.step:nth-child(3){animation-delay:.2s}.step:nth-child(4){animation-delay:.3s}
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--navy2); border: 1.5px solid rgba(200,121,65,.4);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem; font-size: 1.15rem; font-weight: 800;
+      color: var(--copper); position: relative; z-index: 1;
+      transition: background .25s, border-color .25s;
+    }
+    .step:hover .step-num { background: rgba(200,121,65,.15); border-color: var(--copper); }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+    .step p { color: var(--gray); font-size: .88rem; line-height: 1.6; }
+
+    /* ─── CTA ─────────────────────────────────────────── */
+    #cta {
+      background: linear-gradient(135deg, rgba(200,121,65,.1) 0%, var(--dark) 60%);
+      text-align: center; padding: 6rem 6%;
+      border-top: 1px solid rgba(200,121,65,.15);
+    }
+    #cta h2 { max-width: 700px; margin: 0 auto 1.2rem; }
+    #cta p { color: var(--gray); max-width: 520px; margin: 0 auto 2.5rem; font-size: 1.05rem; line-height: 1.7; }
+    .contact-strip {
+      margin-top: 3.5rem;
+      display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+      gap: .8rem; align-items: end; max-width: 800px; margin-left: auto; margin-right: auto;
+    }
+    .input-group { display: flex; flex-direction: column; gap: .4rem; text-align: left; }
+    .input-group label { font-size: .8rem; font-weight: 600; color: var(--gray); }
+    .input-group input {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px; padding: .75rem 1rem; color: var(--white);
+      font-size: .95rem; font-family: inherit; outline: none; transition: border-color .2s;
+    }
+    .input-group input:focus { border-color: var(--copper); }
+    .input-group input::placeholder { color: var(--gray); }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 3rem 6%;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+    }
+    .footer-brand .logo { font-size: 1.3rem; display: flex; margin-bottom: 1rem; }
+    .footer-brand p { color: var(--gray); font-size: .88rem; line-height: 1.7; max-width: 280px; }
+    footer h4 { font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gray2); margin-bottom: 1.2rem; }
+    footer ul { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+    footer ul a { color: var(--gray); font-size: .9rem; text-decoration: none; transition: color .2s; }
+    footer ul a:hover { color: var(--copper); }
+    .footer-bottom {
+      padding: 1.5rem 6%; background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,.05);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem; color: var(--gray); font-size: .82rem;
+    }
+    .footer-bottom a { color: var(--gray); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--copper); }
+
+    /* SOCIAL ICONS */
+    .social-links { display: flex; gap: .8rem; margin-top: .5rem; }
+    .social-link {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(200,121,65,.12); border: 1px solid rgba(200,121,65,.25);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--copper); text-decoration: none; font-size: .75rem; font-weight: 700;
+      transition: background .2s, border-color .2s, transform .15s;
+    }
+    .social-link:hover { background: rgba(200,121,65,.25); border-color: var(--copper); transform: translateY(-2px); }
+    .social-link svg { width: 16px; height: 16px; fill: var(--copper); }
+
+    /* WHATSAPP FLOAT */
+    .whatsapp-float {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: #25D366; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,.5);
+      text-decoration: none; transition: transform .2s, box-shadow .2s;
+    }
+    .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,.65); }
+    .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .metrics-grid { grid-template-columns: repeat(2,1fr); }
+      .services-grid { grid-template-columns: repeat(2,1fr); }
+      footer { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      #hero { grid-template-columns: 1fr; padding-top: 6rem; }
+      .hero-visual { height: 300px; }
+      .nav-links { display: none; }
+      .process-steps { grid-template-columns: repeat(2,1fr); }
+      .process-steps::before { display: none; }
+      .contact-strip { grid-template-columns: 1fr; }
+      footer { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 520px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <!-- Logo SVG inline basado en el diseño BVR -->
+    <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="22" height="34" rx="2" stroke="#4A4A4A" stroke-width="2.5" fill="none"/>
+      <text x="7" y="26" font-family="Inter,sans-serif" font-weight="900" font-size="18" fill="#4A4A4A">B</text>
+      <polyline points="24,8 32,20 24,32" stroke="#C87941" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="28" y1="10" x2="37" y2="4" stroke="#C87941" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="8" r="2" fill="#C87941"/>
+      <circle cx="24" cy="32" r="2" fill="#4A4A4A"/>
+      <circle cx="32" cy="20" r="2" fill="#C87941"/>
+    </svg>
+    BVR <span>&nbsp;DATA FLOW</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#metricas">Resultados</a></li>
+    <li><a href="#cta">Contacto</a></li>
+  </ul>
+  <a href="https://wa.me/526648032081" class="nav-cta" target="_blank">Habla con un asesor</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🇲🇽 Especialistas en PyMEs Mexicanas</div>
+    <h1>Tu empresa, impulsada por <em>datos y estrategia</em></h1>
+    <p class="hero-sub">
+      Ayudamos a PyMEs en México a crecer con estrategias digitales a la medida, automatización de procesos y análisis de datos que generan resultados reales — no promesas.
+    </p>
+    <div class="hero-actions">
+      <a href="https://wa.me/526648032081" class="btn-primary" target="_blank">Diagnóstico gratuito →</a>
+      <a href="#servicios" class="btn-secondary">Ver servicios</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <canvas id="flowCanvas"></canvas>
+  </div>
+</section>
+
+<!-- MÉTRICAS -->
+<section id="metricas">
+  <div>
+    <p class="section-eyebrow">Impacto real</p>
+    <h2>Números que hablan <em>por sí solos</em></h2>
+    <p class="section-sub">Transformamos la forma en que las PyMEs mexicanas toman decisiones: con datos claros, estrategia real y tecnología accesible.</p>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-num">360<span>°</span></div>
+      <div class="metric-label">Diagnóstico integral de tu negocio desde el primer día</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-num">-38<span>%</span></div>
+      <div class="metric-label">Reducción potencial en costos operativos con automatización</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-num">3<span>x</span></div>
+      <div class="metric-label">Potencial de crecimiento en ventas digitales en 12 meses</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-num">100<span>%</span></div>
+      <div class="metric-label">Compromiso con los resultados de tu empresa</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="services-header">
+    <div>
+      <p class="section-eyebrow">Lo que hacemos</p>
+      <h2>Soluciones diseñadas<br>para tu <em>industria</em></h2>
+    </div>
+    <p class="section-sub" style="max-width:380px;">No usamos recetas genéricas. Cada estrategia se construye desde cero analizando tu mercado, tu equipo y tus metas.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">📊</div>
+      <h3>Análisis de Datos & BI</h3>
+      <p>Convertimos tu información dispersa en dashboards claros y accionables. Toma decisiones basadas en datos, no en suposiciones.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🚀</div>
+      <h3>Estrategia de Crecimiento Digital</h3>
+      <p>Diseñamos el camino más corto entre donde estás y donde quieres estar: SEO, publicidad pagada, embudos de conversión y más.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">⚙️</div>
+      <h3>Automatización de Procesos</h3>
+      <p>Identificamos tareas repetitivas que consumen tiempo de tu equipo y las automatizamos para que enfoquen su energía en lo que importa.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🛒</div>
+      <h3>E-commerce & Ventas Online</h3>
+      <p>Implementamos tiendas en línea optimizadas para el mercado mexicano con integración a MercadoLibre, Shopify y soluciones a medida.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🎯</div>
+      <h3>Marketing con Datos</h3>
+      <p>Campañas publicitarias guiadas por métricas reales. Segmentamos tu audiencia ideal y maximizamos cada peso invertido.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔒</div>
+      <h3>Transformación Tecnológica</h3>
+      <p>Diagnóstico, selección e implementación de herramientas digitales (ERP, CRM, sistemas de inventario) adaptadas a tu presupuesto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section id="proceso">
+  <div style="text-align:center; max-width:600px; margin:0 auto 1rem;">
+    <p class="section-eyebrow">Cómo trabajamos</p>
+    <h2>De la idea al <em>resultado</em> en 4 pasos</h2>
+  </div>
+  <div class="process-steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Diagnóstico</h3>
+      <p>Analizamos tu negocio, competencia y mercado para identificar oportunidades y cuellos de botella.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Estrategia</h3>
+      <p>Diseñamos un plan personalizado con metas claras, plazos definidos y KPIs medibles desde el día 1.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Ejecución</h3>
+      <p>Implementamos con tu equipo (o el nuestro) de forma ágil, iterando con base en datos en tiempo real.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Escalamiento</h3>
+      <p>Consolidamos los resultados y construimos los sistemas para que tu crecimiento sea sostenible.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <p class="section-eyebrow" style="text-align:center;">¿Listo para crecer?</p>
+  <h2>Obtén un diagnóstico<br><em>gratuito</em> de tu negocio</h2>
+  <p>En 30 minutos identificamos las 3 principales oportunidades digitales de tu PyME — sin costo y sin compromiso.</p>
+  <div class="contact-strip">
+    <div class="input-group">
+      <label>Nombre</label>
+      <input type="text" placeholder="Tu nombre completo" />
+    </div>
+    <div class="input-group">
+      <label>Empresa</label>
+      <input type="text" placeholder="Nombre de tu empresa" />
+    </div>
+    <div class="input-group">
+      <label>WhatsApp</label>
+      <input type="tel" placeholder="+52 664 803 2081" />
+    </div>
+    <a href="https://wa.me/526648032081" class="btn-primary" style="white-space:nowrap; text-align:center;" target="_blank">Agendar gratis →</a>
+  </div>
+  <p style="margin-top:1.2rem; color:var(--gray); font-size:.82rem;">Respondemos en menos de 24 horas · Sin spam · Tus datos están seguros</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="logo">BVR <span>DATA FLOW</span></span>
+    <p>Estrategia digital, análisis de datos y transformación tecnológica para PyMEs mexicanas que quieren crecer con inteligencia.</p>
+    <div class="social-links" style="margin-top:1.2rem;">
+      <!-- Facebook -->
+      <a href="https://facebook.com/BVRDataFlow" class="social-link" target="_blank" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <!-- Instagram -->
+      <a href="https://instagram.com/BVRDataFlow" class="social-link" target="_blank" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+      <!-- TikTok -->
+      <a href="https://tiktok.com/@BVRDataFlow" class="social-link" target="_blank" aria-label="TikTok">
+        <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+      </a>
+      <!-- WhatsApp -->
+      <a href="https://wa.me/526648032081" class="social-link" target="_blank" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      </a>
+    </div>
+  </div>
+  <div>
+    <h4>Servicios</h4>
+    <ul>
+      <li><a href="#servicios">Análisis de Datos</a></li>
+      <li><a href="#servicios">Estrategia Digital</a></li>
+      <li><a href="#servicios">Automatización</a></li>
+      <li><a href="#servicios">E-commerce</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Empresa</h4>
+    <ul>
+      <li><a href="#">Nosotros</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#cta">Contacto</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Contacto</h4>
+    <ul>
+      <li><a href="mailto:info.bvr.dataflow@gmail.com">info.bvr.dataflow@gmail.com</a></li>
+      <li><a href="https://wa.me/526648032081" target="_blank">+52 664 803 2081</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2025 BVR Data Flow. Todos los derechos reservados.</span>
+  <div style="display:flex; gap:1.5rem;">
+    <a href="#">Privacidad</a>
+    <a href="#">Términos</a>
+  </div>
+</div>
+
+<!-- WHATSAPP FLOTANTE -->
+<a href="https://wa.me/526648032081" class="whatsapp-float" aria-label="Chatea por WhatsApp" target="_blank">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+
+<script>
+// ─── DATA FLOW ANIMATION ─────────────────────────────────────
+const canvas = document.getElementById('flowCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = {
+  copper: '#C87941', copper2: '#E09058',
+  white: 'rgba(247,248,250,0.85)', dim: 'rgba(154,154,154,0.4)'
+};
+
+const nodeData = [
+  { label: 'Tu PyME', icon: '🏢', x: .5, y: .5, main: true },
+  { label: 'Datos', icon: '📊', x: .15, y: .2 },
+  { label: 'Estrategia', icon: '🎯', x: .8, y: .18 },
+  { label: 'Marketing', icon: '📣', x: .85, y: .55 },
+  { label: 'Ventas', icon: '💰', x: .65, y: .82 },
+  { label: 'Procesos', icon: '⚙️', x: .3, y: .8 },
+  { label: 'Tech', icon: '💻', x: .12, y: .58 },
+];
+
+const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,6],[2,3],[3,4],[4,5],[5,6]];
+
+let particles = [];
+setInterval(() => {
+  edges.forEach(([a,b]) => { if (Math.random() < .35) particles.push({ from:a, to:b, t:0, speed: 0.005 + Math.random()*.008 }); });
+}, 400);
+
+function draw(ts) {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // BG glow
+  const grd = ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,H*.55);
+  grd.addColorStop(0,'rgba(200,121,65,.07)'); grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+
+  // Edges
+  edges.forEach(([a,b]) => {
+    const na=nodeData[a], nb=nodeData[b];
+    ctx.beginPath(); ctx.moveTo(na.x*W,na.y*H); ctx.lineTo(nb.x*W,nb.y*H);
+    ctx.strokeStyle='rgba(200,121,65,.2)'; ctx.lineWidth=1; ctx.stroke();
+  });
+
+  // Particles
+  particles = particles.filter(p => {
+    p.t += p.speed;
+    if (p.t > 1) return false;
+    const na=nodeData[p.from], nb=nodeData[p.to];
+    const x=(na.x+(nb.x-na.x)*p.t)*W, y=(na.y+(nb.y-na.y)*p.t)*H;
+    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle=COLORS.copper2; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2);
+    ctx.fillStyle='rgba(224,144,88,.15)'; ctx.fill();
+    return true;
+  });
+
+  // Nodes
+  nodeData.forEach(n => {
+    const x=n.x*W, y=n.y*H, r=n.main?40:28;
+    const pulse = n.main ? 1+.04*Math.sin(ts*.002) : 1;
+    const g=ctx.createRadialGradient(x,y,0,x,y,r*2.5*pulse);
+    g.addColorStop(0, n.main?'rgba(200,121,65,.28)':'rgba(200,121,65,.1)');
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r*2.5*pulse,0,Math.PI*2); ctx.fill();
+
+    ctx.beginPath(); ctx.arc(x,y,r*pulse,0,Math.PI*2);
+    ctx.fillStyle=n.main?'#2A1800':'#242424'; ctx.fill();
+    ctx.strokeStyle=n.main?COLORS.copper:'rgba(200,121,65,.45)';
+    ctx.lineWidth=n.main?2:1.5; ctx.stroke();
+
+    ctx.font=`${n.main?20:13}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(n.icon, x, y-(n.main?0:1));
+
+    ctx.font=`${n.main?11:9}px Inter,sans-serif`;
+    ctx.fillStyle=n.main?COLORS.copper2:COLORS.white;
+    ctx.fillText(n.label, x, y+r*pulse+12);
+  });
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// Scroll animations
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+  });
+}, { threshold:.1 });
+
+document.querySelectorAll('.metric-card, .service-card').forEach(el => {
+  el.style.opacity='0'; el.style.transform='translateY(24px)';
+  el.style.transition='opacity .5s ease, transform .5s ease';
+  obs.observe(el);
+});
+
+// Sticky nav
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background =
+    window.scrollY > 40 ? 'rgba(17,17,17,.98)' : 'rgba(26,26,26,.88)';
+});
+</script>
+</body>
+</html>
